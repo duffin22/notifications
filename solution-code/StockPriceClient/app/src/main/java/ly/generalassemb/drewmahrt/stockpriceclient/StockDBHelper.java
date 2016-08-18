@@ -55,6 +55,13 @@ public class StockDBHelper extends SQLiteOpenHelper {
     return rowId;
   }
 
+  public void dropAllTables() {
+    SQLiteDatabase db = getWritableDatabase();
+
+    db.execSQL("DELETE FROM STOCKS");
+    db.close();
+  }
+
   public int updateStockById(String id, ContentValues values) {
     SQLiteDatabase db = getWritableDatabase();
 

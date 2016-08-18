@@ -55,11 +55,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
     }
 
     private void getPortfolioStocks(){
+        StockDBHelper helpy = new StockDBHelper(getContext(), null, null, 1);
+        helpy.dropAllTables();
+
 //        Cursor cursor = mResolver.query(SYMBOLS_CONTENT_URI,null,"exchange = 'NYSE'",null,null);
         Cursor cursor = mResolver.query(SYMBOLS_CONTENT_URI,null,null,null,null);
-        while(cursor != null && cursor.moveToNext()) {
-            updateStockInfo(cursor.getString(0),true);
-        }
+//        while(cursor != null && cursor.moveToNext()) {
+//            updateStockInfo(cursor.getString(0),true);
+//        }
+        updateStockInfo("",true);
     }
 
     private void getNYSEStocks(String input){
@@ -95,7 +99,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
 
     public void updateStockInfo(final String symbol, final boolean isPortfolio){
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        String stockUrl = "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol="+symbol;
+//        String stockUrl = "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol="+symbol;
 
         String redditUrl = "https://www.reddit.com/r/random/.json";
 
@@ -104,7 +108,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Cursor checkCursor = mResolver.query(StockPriceContentProvider.CONTENT_URI,null,"stock_symbol='"+symbol+"'",null,null);
+//                        Cursor checkCursor = mResolver.query(StockPriceContentProvider.CONTENT_URI,null,"stock_symbol='"+symbol+"'",null,null);
 //                        Log.d(SyncAdapter.class.getName() + "MATT",response.toString());
                         try {
                             JSONObject data = response.getJSONObject("data");
@@ -132,7 +136,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                         }catch (Exception e){
                             Log.d(SyncAdapter.class.getName() + "MATT-TITLE","Caught an exception");
                         }
-                        checkCursor.close();
+//                        checkCursor.close();
                     }
                 }, new Response.ErrorListener() {
 
