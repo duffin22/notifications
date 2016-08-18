@@ -50,12 +50,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(SyncAdapter.class.getName(),"Starting sync");
         getPortfolioStocks();
-        getNYSEStocks("C");
+//        getNYSEStocks("C");
 
     }
 
     private void getPortfolioStocks(){
-        Cursor cursor = mResolver.query(SYMBOLS_CONTENT_URI,null,"exchange = 'NYSE'",null,null);
+//        Cursor cursor = mResolver.query(SYMBOLS_CONTENT_URI,null,"exchange = 'NYSE'",null,null);
+        Cursor cursor = mResolver.query(SYMBOLS_CONTENT_URI,null,null,null,null);
         while(cursor != null && cursor.moveToNext()) {
             updateStockInfo(cursor.getString(0),true);
         }
@@ -96,57 +97,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String stockUrl = "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol="+symbol;
 
-        JsonObjectRequest stockJsonRequest = new JsonObjectRequest
-                (Request.Method.GET, stockUrl, null, new Response.Listener<JSONObject>() {
+        String redditUrl = "https://www.reddit.com/r/random/.json";
+
+        JsonObjectRequest redditJsonRequest = new JsonObjectRequest
+                (Request.Method.GET, redditUrl, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         Cursor checkCursor = mResolver.query(StockPriceContentProvider.CONTENT_URI,null,"stock_symbol='"+symbol+"'",null,null);
-                        Log.d(SyncAdapter.class.getName(),response.toString());
+//                        Log.d(SyncAdapter.class.getName() + "MATT",response.toString());
                         try {
-                            if (checkCursor.moveToFirst()) {
-                                //Stock already exists in database, so an update is needed
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put("price", response.getString("LastPrice"));
-                                if(isPortfolio){
-                                    contentValues.put("portfolio",true);
-                                }else {
-                                    contentValues.put("portfolio",false);
-                                }
+                            JSONObject data = response.getJSONObject("data");
+                            JSONArray children = data.getJSONArray("children");
+                            JSONObject listingOne = (JSONObject) children.get(0);
+                            JSONObject listingOneData = listingOne.getJSONObject("data");
+                            String title = listingOneData.get("title").toString();
+                            boolean over18 = (boolean) listingOneData.get("over_18");
+                            String subreddit = listingOneData.get("subreddit").toString();
+                            int score = (int) listingOneData.get("score");
 
-                                mResolver.update(StockPriceContentProvider.CONTENT_URI, contentValues, "stock_symbol='" + symbol + "'", null);
-                            } else {
-                                //Stock is new, so it needs to be inserted into database
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put(StockDBHelper.COLUMN_STOCK_PRICE, response.getString("LastPrice"));
-                                contentValues.put(StockDBHelper.COLUMN_STOCK_NAME,response.getString("Name"));
-                                contentValues.put(StockDBHelper.COLUMN_STOCK_SYMBOL,symbol);
+                            RedditListing post = new RedditListing(subreddit,title,score,over18);
 
-                                if(isPortfolio){
-                                    contentValues.put("portfolio",true);
-                                }else {
-                                    contentValues.put("portfolio",false);
-                                }
+                            Log.d(SyncAdapter.class.getName() + "MATT-TITLE",""+over18+", "+score);
 
-                                if(!response.getString("LastPrice").equals("0")) {
-                                    Uri uri = mResolver.insert(StockPriceContentProvider.CONTENT_URI, contentValues);
-                                    Log.d(MainActivity.class.getName(), "Inserted at: " + uri);
-                                }
-                            }
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(StockDBHelper.COLUMN_STOCK_PRICE, "Score: "+score);
+                            contentValues.put(StockDBHelper.COLUMN_STOCK_NAME,title);
+                            contentValues.put(StockDBHelper.COLUMN_STOCK_SYMBOL,subreddit);
+                            contentValues.put("portfolio",true);
+                            Uri uri = mResolver.insert(StockPriceContentProvider.CONTENT_URI, contentValues);
+
+                            Log.d(MainActivity.class.getName(), "Inserted at: " + uri);
+
                         }catch (Exception e){
-
+                            Log.d(SyncAdapter.class.getName() + "MATT-TITLE","Caught an exception");
                         }
+                        checkCursor.close();
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
 
                     }
                 });
-
-        queue.add(stockJsonRequest);
+        queue.add(redditJsonRequest);
     }
 }
 
