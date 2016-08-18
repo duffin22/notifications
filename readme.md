@@ -13,26 +13,25 @@ creator:
 
 > ***Note:*** _This should be done in pairs._
 
-In this lab, you will be setting up a sync adapter to get the latest stock prices from a sample of companies on the [New York Stock Exchange](https://www.nyse.com/index) using the [MarkIt On Demand API](http://dev.markitondemand.com/MODApis/). The prices should update every minute.
-
-In addition, you will be retrieving stocks from the Portfolio app's Content Provider that are in the NYSE and display those. Stocks that are in your portfolio should be shown differently than the other stocks (ie making the background green).
+The solution code for this lab shows you how to build a stock portfolio app that updates every 60 seconds. Use the information you gain from this example to make calls to a random [reddit sub](https://www.reddit.com/r/random.json) once every 90 seconds. Your app should be able to show the current random subreddit as well as the title, url, and votes (if applicable) of each post in the sub. Make sure that each post is stored in the database. 
 
 **Hint**
-- Use the Company Lookup API to retrieve a listing of multiple companies
+- Be very careful with the parsing for the reddit json object. It is much more difficult than the stock json object.
+- Move slowly. Authenticator errors can pop up easily if you delete the wrong code. 
 
 ## Exercise
 
 #### Requirements
 
-- Display stocks of your choice from the NYSE, including the latest price
-- Update the stock price every minute using a Sync adapter
+- Display the top reddit articles for the random sub with relevant information (title, url, and votes)
+- Update the displayed articles and subreddit using a Sync adapter every 90 minutes
 - Store the data after each update in a local database
-- Retrieve Portfolio stocks from the Portfolio app
-- Display the Portfolio stocks in a unique manner
+- Allow the user to navigate to the particular article when that article is clicked
 
 **Bonus:**
 - Allow the user to set the sync period
-- Allow the user to choose another exchange besides the NYSE (NYSE must be an option)
+- Allow user to stop the sync
+- Add the reddit article's image to the listview
 
 #### Deliverable
 
