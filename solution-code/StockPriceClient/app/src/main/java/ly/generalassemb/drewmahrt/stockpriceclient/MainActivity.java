@@ -73,17 +73,14 @@ public class MainActivity extends AppCompatActivity {
                 TextView text1 = (TextView) view.findViewById(android.R.id.text1);
                 TextView text2 = (TextView) view.findViewById(android.R.id.text2);
 
-                if(cursor.getString(cursor.getColumnIndex("portfolio")).equals("1"))
-                    view.setBackgroundColor(Color.GREEN);
-                else
-                    view.setBackgroundResource(android.R.color.background_light);
+                view.setBackgroundResource(android.R.color.background_light);
 
                 String name = cursor.getString(cursor.getColumnIndex(StockDBHelper.COLUMN_STOCK_NAME));
                 String symbol = cursor.getString(cursor.getColumnIndex(StockDBHelper.COLUMN_STOCK_SYMBOL));
                 String price = cursor.getString(cursor.getColumnIndex(StockDBHelper.COLUMN_STOCK_PRICE));
 
                 text1.setText(name+" ("+symbol+")");
-                text2.setText("$"+price);
+                text2.setText(price);
             }
         };
 

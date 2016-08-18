@@ -17,10 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/updated_text"
         android:orientation="vertical">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NASDAQ Stocks"/>
         <ListView
             android:id="@+id/stock_price_list"
             android:layout_width="match_parent"
