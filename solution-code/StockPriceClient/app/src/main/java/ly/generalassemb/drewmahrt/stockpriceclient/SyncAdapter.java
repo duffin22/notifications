@@ -113,25 +113,27 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                         try {
                             JSONObject data = response.getJSONObject("data");
                             JSONArray children = data.getJSONArray("children");
-                            JSONObject listingOne = (JSONObject) children.get(0);
-                            JSONObject listingOneData = listingOne.getJSONObject("data");
-                            String title = listingOneData.get("title").toString();
-                            boolean over18 = (boolean) listingOneData.get("over_18");
-                            String subreddit = listingOneData.get("subreddit").toString();
-                            int score = (int) listingOneData.get("score");
+                            for (int i = 0;i < children.length();i++) {
+                                JSONObject listingOne = (JSONObject) children.get(i);
+                                JSONObject listingOneData = listingOne.getJSONObject("data");
+                                String title = listingOneData.get("title").toString();
+                                boolean over18 = (boolean) listingOneData.get("over_18");
+                                String subreddit = listingOneData.get("subreddit").toString();
+                                int score = (int) listingOneData.get("score");
 
-                            RedditListing post = new RedditListing(subreddit,title,score,over18);
+                                RedditListing post = new RedditListing(subreddit, title, score, over18);
 
-                            Log.d(SyncAdapter.class.getName() + "MATT-TITLE",""+over18+", "+score);
+                                Log.d(SyncAdapter.class.getName() + "MATT-TITLE", "" + over18 + ", " + score);
 
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put(StockDBHelper.COLUMN_STOCK_PRICE, "Score: "+score);
-                            contentValues.put(StockDBHelper.COLUMN_STOCK_NAME,title);
-                            contentValues.put(StockDBHelper.COLUMN_STOCK_SYMBOL,subreddit);
-                            contentValues.put("portfolio",true);
-                            Uri uri = mResolver.insert(StockPriceContentProvider.CONTENT_URI, contentValues);
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put(StockDBHelper.COLUMN_STOCK_PRICE, "Score: " + score);
+                                contentValues.put(StockDBHelper.COLUMN_STOCK_NAME, title);
+                                contentValues.put(StockDBHelper.COLUMN_STOCK_SYMBOL, subreddit);
+                                contentValues.put("portfolio", true);
+                                Uri uri = mResolver.insert(StockPriceContentProvider.CONTENT_URI, contentValues);
 
-                            Log.d(MainActivity.class.getName(), "Inserted at: " + uri);
+                                Log.d(MainActivity.class.getName(), "Inserted at: " + uri);
+                            }
 
                         }catch (Exception e){
                             Log.d(SyncAdapter.class.getName() + "MATT-TITLE","Caught an exception");
